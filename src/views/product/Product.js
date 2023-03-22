@@ -206,7 +206,10 @@ function EnhancedTableToolbar(props) {
   }
 
   const handleClickDelete = () => {
-    axios.delete(`${domainName}/api/v1/products`, { data: selectedIndexGLobal })
+    // axios.delete(`${domainName}/api/v1/products`, { data: selectedIndexGLobal })
+    axios.delete(`${domainName}/api/v1/products/${selectedIndexGLobal[0]}`, {
+      data: selectedIndexGLobal,
+    })
   }
 
   const handleClickOpenEdit = (event) => {
@@ -221,7 +224,7 @@ function EnhancedTableToolbar(props) {
 
   const handleClickEdit = () => {
     const id = selectedIndexGLobal[0]
-    axios.put(`${domainName}api/v1/products/${id}`, {
+    axios.put(`${domainName}/api/v1/products/${id}`, {
       name: name,
       categoryId: categories.filter((e) => e.name === category)[0].id,
       price: price,
