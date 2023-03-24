@@ -22,7 +22,6 @@ import {
   Autocomplete,
   LinearProgress,
 } from '@mui/material'
-import { CFormInput } from '@coreui/react'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
@@ -74,35 +73,14 @@ const headCells = [
     position: 'left',
     disablePadding: false,
     sort: true,
-    label: 'Tên sản phẩm',
+    label: 'Tên danh mục chi tiết',
   },
   {
-    id: 'detailedCategory',
+    id: 'category',
     position: 'left',
     disablePadding: false,
     sort: true,
     label: 'Danh mục',
-  },
-  {
-    id: 'price',
-    position: 'left',
-    disablePadding: false,
-    sort: true,
-    label: 'Giá',
-  },
-  {
-    id: 'describe',
-    position: 'left',
-    disablePadding: false,
-    sort: false,
-    label: 'Mô tả',
-  },
-  {
-    id: 'image',
-    position: 'right',
-    disablePadding: false,
-    sort: false,
-    label: 'Ảnh',
   },
 ]
 
@@ -173,14 +151,14 @@ EnhancedTableHead.propTypes = {
 
 var selectedIndexGLobal
 
-const Product = () => {
+const DetailedCategory = () => {
   const [order, setOrder] = useState('asc')
   const [orderBy, setOrderBy] = useState('id')
   const [selected, setSelected] = useState([])
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [rows, setRows] = useState([])
-  const [detailedCategories, setDetailedCategories] = useState([])
+  const [categories, setCategories] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
   const handleRequestSort = (event, property) => {
@@ -235,10 +213,10 @@ const Product = () => {
   const fetchData = async () => {
     setIsLoading(true)
     try {
+      const res_1 = await axios.get(`${domainName}/api/v1/categories/getAll`)
       const res = await axios.get(`${domainName}/api/v1/detailedCategories/getAll`)
-      const res_1 = await axios.get(`${domainName}/api/v1/products/getAll`)
-      setRows(res_1.data)
-      setDetailedCategories(res.data)
+      setRows(res.data)
+      setCategories(res_1.data)
     } catch (error) {
       console.log(error)
     }
@@ -249,77 +227,50 @@ const Product = () => {
     fetchData()
   }, [])
 
-  EnhancedTableToolbar.propTypes = {
-    numSelected: PropTypes.number.isRequired,
-  }
-
   function EnhancedTableToolbar(props) {
     const { numSelected } = props
     const [anchorEl, setAnchorEl] = useState(null)
     const [name, setName] = useState()
-    const [price, setPrice] = useState()
-    const [description, setDescription] = useState()
-    const [detailedCategory, setDetailedCategory] = useState()
-    const [base64, setBase64] = useState()
+    const [category, setCategory] = useState()
+    const open = Boolean(anchorEl)
+    const id = open ? 'simple-popover' : undefined
 
     const defaultProps = {
-      options: detailedCategories.map((option) => option.name),
-    }
-
-    const handleChangeImageInput = (e) => {
-      let reader = new FileReader()
-      reader.readAsDataURL(e.target.files[0])
-      reader.onload = () => {
-        setBase64(reader.result)
-      }
+      options: categories.map((option) => option.name),
     }
 
     const handleClickAdd = async () => {
       setIsLoading(true)
-      await axios.post(`${domainName}/api/v1/products/add`, {
+      await axios.post(`${domainName}/api/v1/detailedCategories/add`, {
         name: name,
-        detailedCategoryId: detailedCategories.filter((e) => e.name === detailedCategory)[0].id,
-        price: price,
-        description: description,
-        image: base64,
+        categoryId: categories.filter((e) => e.name === category)[0].id,
       })
       fetchData()
     }
 
     const handleClickDelete = async () => {
       setIsLoading(true)
-      await axios.put(`${domainName}/api/v1/products/deleteMultiple`, selectedIndexGLobal)
+      await axios.put(`${domainName}/api/v1/detailedCategories/deleteMultiple`, selectedIndexGLobal)
       fetchData()
       setSelected([])
     }
 
     const handleClickOpenEdit = (event) => {
       setAnchorEl(event.currentTarget)
-      const productEdit = rows.filter((e) => e.id === parseInt(selectedIndexGLobal[0]))[0]
-      setName(productEdit.name)
-      setDetailedCategory(
-        detailedCategories.filter((e) => e.id === productEdit.detailedCategoryId)[0].name,
-      )
-      setPrice(productEdit.price)
-      setDescription(productEdit.description)
-      setBase64(productEdit.image)
+      const detailedCategoryEdit = rows.filter((e) => e.id === parseInt(selectedIndexGLobal[0]))[0]
+      setName(detailedCategoryEdit.name)
+      setCategory(categories.filter((e) => e.id === detailedCategoryEdit.categoryId)[0].name)
     }
 
     const handleClickEdit = async () => {
       setIsLoading(true)
       const id = selectedIndexGLobal[0]
-      await axios.put(`${domainName}/api/v1/products/update/${id}`, {
+      await axios.put(`${domainName}/api/v1/detailedCategories/update/${id}`, {
         name: name,
-        detailedCategoryId: detailedCategories.filter((e) => e.name === detailedCategory)[0].id,
-        price: price,
-        description: description,
-        image: base64,
+        categoryId: categories.filter((e) => e.name === category)[0].id,
       })
       fetchData()
     }
-
-    const open = Boolean(anchorEl)
-    const id = open ? 'simple-popover' : undefined
 
     return (
       <Toolbar
@@ -371,7 +322,7 @@ const Product = () => {
                   >
                     <TextField
                       id="standard-basic"
-                      label="Tên sản phẩm"
+                      label="Tên danh mục"
                       variant="standard"
                       fullWidth
                       value={name}
@@ -380,34 +331,14 @@ const Product = () => {
                     <Autocomplete
                       {...defaultProps}
                       fullWidth
-                      value={detailedCategory}
+                      value={category}
                       onChange={(event, newValue) => {
-                        setDetailedCategory(newValue)
+                        setCategory(newValue)
                       }}
                       renderInput={(params) => (
                         <TextField {...params} label="Danh mục" variant="standard" />
                       )}
                     />
-                    <TextField
-                      id="standard-basic"
-                      label="Giá (đ)"
-                      variant="standard"
-                      fullWidth
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      type="number"
-                    />
-                    <TextField
-                      id="filled-multiline-flexible"
-                      label="Mô tả sản phẩm"
-                      fullWidth
-                      multiline
-                      variant="filled"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                    />
-                    <img src={base64} alt={name} width={100} />
-                    <CFormInput type="file" onChange={handleChangeImageInput} accept="image/*" />
                     <Button variant="contained" onClick={handleClickEdit}>
                       Sửa
                     </Button>
@@ -453,7 +384,7 @@ const Product = () => {
                   >
                     <TextField
                       id="standard-basic"
-                      label="Tên sản phẩm"
+                      label="Tên danh mục chi tiết"
                       variant="standard"
                       fullWidth
                       value={name}
@@ -462,33 +393,14 @@ const Product = () => {
                     <Autocomplete
                       {...defaultProps}
                       fullWidth
-                      value={detailedCategory}
+                      value={category}
                       onChange={(event, newValue) => {
-                        setDetailedCategory(newValue)
+                        setCategory(newValue)
                       }}
                       renderInput={(params) => (
                         <TextField {...params} label="Danh mục" variant="standard" />
                       )}
                     />
-                    <TextField
-                      id="standard-basic"
-                      label="Giá (đ)"
-                      variant="standard"
-                      fullWidth
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      type="number"
-                    />
-                    <TextField
-                      id="filled-multiline-flexible"
-                      label="Mô tả sản phẩm"
-                      fullWidth
-                      multiline
-                      variant="filled"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                    />
-                    <CFormInput type="file" onChange={handleChangeImageInput} />
                     <Button variant="contained" disableElevation onClick={handleClickAdd}>
                       Thêm
                     </Button>
@@ -500,6 +412,10 @@ const Product = () => {
         )}
       </Toolbar>
     )
+  }
+
+  EnhancedTableToolbar.propTypes = {
+    numSelected: PropTypes.number.isRequired,
   }
 
   return (
@@ -554,12 +470,7 @@ const Product = () => {
                       </TableCell>
                       <TableCell align="left">{row.name}</TableCell>
                       <TableCell align="left">
-                        {detailedCategories.filter((e) => e.id === row.detailedCategoryId)[0].name}
-                      </TableCell>
-                      <TableCell align="left">{row.price}</TableCell>
-                      <TableCell align="left">{row.description}</TableCell>
-                      <TableCell align="right">
-                        <img src={row.image} width={100} alt={row.name} />
+                        {categories.filter((e) => e.id === row.categoryId)[0].name}
                       </TableCell>
                     </TableRow>
                   )
@@ -590,4 +501,4 @@ const Product = () => {
   )
 }
 
-export default Product
+export default DetailedCategory
