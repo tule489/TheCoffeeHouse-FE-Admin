@@ -6,11 +6,15 @@ const Category = React.lazy(() => import('./views/category/category'))
 const DetailedCategory = React.lazy(() => import('./views/detailedCategory/detailCategory'))
 
 const routes = [
-  { path: '/', exact: true, name: 'Home' },
-  { path: '/products', name: 'Quản lý sản phẩm', element: Product },
-  { path: '/category/category', name: 'Danh mục', element: Category },
-  { path: '/category/detailedCategory', name: 'Danh mục chi tiết', element: DetailedCategory },
-  { path: '/stats', name: 'Thống kê doanh thu', element: Stats },
+  { path: '/products', exact: true, name: 'Quản lý sản phẩm', element: Product },
+  { path: '/category/category', exact: true, name: 'Danh mục', element: Category },
+  {
+    path: '/category/detailedCategory',
+    exact: true,
+    name: 'Danh mục chi tiết',
+    element: DetailedCategory,
+  },
+  { path: '/stats', exact: true, name: 'Thống kê doanh thu', element: Stats },
 ]
 
 export default routes
