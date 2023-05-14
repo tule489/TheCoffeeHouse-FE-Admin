@@ -25,15 +25,16 @@ class App extends Component {
             <Route
               path="/login"
               name="Login Page"
-              element={localStorage.getItem('userId') != null ? <Navigate to="/" /> : <Login />}
+              element={sessionStorage.getItem('userId') != null ? <Navigate to="/" /> : <Login />}
             />
             <Route exact path="/register" name="Register Page" element={<Register />} />
             <Route exact path="/404" name="Page 404" element={<Page404 />} />
+            <Route exact path="/changePassword" name="Change password" element={<Page404 />} />
             <Route
               path="*"
               name="Home"
               element={
-                localStorage.getItem('userId') != null ? (
+                sessionStorage.getItem('userId') != null ? (
                   <DefaultLayout />
                 ) : (
                   <Navigate to="/login" />

@@ -1,6 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilChartLine, cilClipboard, cilFastfood, cilList } from '@coreui/icons'
+import { cilChartLine, cilClipboard, cilFastfood, cilList, cilUser } from '@coreui/icons'
 import { CNavItem, CNavTitle, CNavGroup } from '@coreui/react'
 
 const _nav = [
@@ -60,6 +60,29 @@ const _nav = [
       color: 'info',
     },
   },
+  sessionStorage.getItem('permission') === 'admin'
+    ? {
+        component: CNavTitle,
+        name: 'Quản lý tài khoản',
+      }
+    : {
+        component: CNavTitle,
+        name: '',
+      },
+  sessionStorage.getItem('permission') === 'admin'
+    ? {
+        component: CNavItem,
+        name: 'Quản lý tài khoản',
+        to: '/accounts',
+        icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+        badge: {
+          color: 'info',
+        },
+      }
+    : {
+        component: CNavTitle,
+        name: '',
+      },
 ]
 
 export default _nav

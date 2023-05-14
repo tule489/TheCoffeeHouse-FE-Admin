@@ -15,6 +15,7 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import axios from 'axios'
+import domainName from 'src/domainName'
 
 const Login = () => {
   const [username, setUsername] = useState()
@@ -24,15 +25,15 @@ const Login = () => {
   const handleClickLogin = async () => {
     try {
       await axios
-        .post('http://localhost:8080/api/v1/user/login', {
+        .post(`${domainName}/api/v1/user/login`, {
           username: username,
           password: password,
         })
         .then((res) => {
           const data = res.data.data
           setMessage(res.data.message)
-          localStorage.setItem('userId', data.id)
-          localStorage.setItem('permission', data.permission)
+          sessionStorage.setItem('userId', data.id)
+          sessionStorage.setItem('permission', data.permission)
         })
     } catch (error) {
       setMessage(error.response.data.message)

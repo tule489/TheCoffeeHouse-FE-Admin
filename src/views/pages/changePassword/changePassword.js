@@ -17,7 +17,7 @@ import axios from 'axios'
 import { Link } from 'react-router-dom'
 import domainName from 'src/domainName'
 
-const Register = () => {
+const ChangePassword = () => {
   const [username, setUsername] = useState()
   const [password, setPassword] = useState()
   const [repeatPassword, setRepeatPassword] = useState()
@@ -26,7 +26,7 @@ const Register = () => {
   const handleClickRegister = async () => {
     if (password === repeatPassword) {
       const res = await axios.post(
-        `${domainName}/api/v1/user/authorization/${sessionStorage.getItem('userId')}`,
+        `${domainName}/api/v1/user/authorization/${localStorage.getItem('userId')}`,
       )
       if (res.data.data === 'admin') {
         try {
@@ -34,14 +34,8 @@ const Register = () => {
             .post(`${domainName}/api/v1/user/register`, {
               username: username,
               password: password,
-              permission: 'staff',
             })
-            .then((res) => {
-              setMessage(res.data.message)
-              setUsername('')
-              setPassword('')
-              setRepeatPassword('')
-            })
+            .then((res) => setMessage(res.data.message))
           return
         } catch (error) {
           setMessage(error.response.data.message)
@@ -60,9 +54,12 @@ const Register = () => {
           <CCol md={9} lg={7} xl={6}>
             <CCard className="mx-4">
               <CCardBody className="p-4">
-                <Link to="/" style={{ textDecoration: 'none' }}>
+                <Link to="/">
                   <CIcon icon={cilArrowLeft} className="me-2" style={{ fontSize: '4rem' }} />
-                  <span className="text-medium-emphasis" style={{ fontSize: 20 }}>
+                  <span
+                    className="text-medium-emphasis"
+                    style={{ fontSize: 20, textDecoration: 'none' }}
+                  >
                     Quay lại
                   </span>
                 </Link>
@@ -128,4 +125,4 @@ const Register = () => {
   )
 }
 
-export default Register
+export default ChangePassword

@@ -66,45 +66,24 @@ function stableSort(array, comparator) {
 const headCells = [
   {
     id: 'id',
-    position: 'left',
+    position: 'center',
     disablePadding: false,
     sort: true,
     label: 'ID',
   },
   {
-    id: 'name',
-    position: 'left',
+    id: 'username',
+    position: 'center',
     disablePadding: false,
     sort: true,
-    label: 'Tên sản phẩm',
+    label: 'Tên tài khoản',
   },
   {
-    id: 'detailedCategory',
-    position: 'left',
+    id: 'password',
+    position: 'center',
     disablePadding: false,
     sort: true,
-    label: 'Danh mục',
-  },
-  {
-    id: 'price',
-    position: 'left',
-    disablePadding: false,
-    sort: true,
-    label: 'Giá',
-  },
-  {
-    id: 'describe',
-    position: 'left',
-    disablePadding: false,
-    sort: false,
-    label: 'Mô tả',
-  },
-  {
-    id: 'image',
-    position: 'right',
-    disablePadding: false,
-    sort: false,
-    label: 'Ảnh',
+    label: 'Mật khẩu',
   },
 ]
 
@@ -175,7 +154,7 @@ EnhancedTableHead.propTypes = {
 
 var selectedIndexGLobal
 
-const Product = () => {
+const Accounts = () => {
   const [order, setOrder] = useState('asc')
   const [orderBy, setOrderBy] = useState('id')
   const [selected, setSelected] = useState([])
@@ -237,10 +216,8 @@ const Product = () => {
   const fetchData = async () => {
     setIsLoading(true)
     try {
-      const res = await axios.get(`${domainName}/api/v1/detailedCategories/getAll`)
-      const res_1 = await axios.get(`${domainName}/api/v1/products/getAll`)
-      setRows(res_1.data)
-      setDetailedCategories(res.data)
+      const res = await axios.get(`${domainName}/api/v1/user/getAll`)
+      setRows(res.data)
     } catch (error) {
       console.log(error)
     }
@@ -258,39 +235,11 @@ const Product = () => {
   function EnhancedTableToolbar(props) {
     const { numSelected } = props
     const [anchorEl, setAnchorEl] = useState(null)
-    const [name, setName] = useState()
-    const [price, setPrice] = useState()
-    const [description, setDescription] = useState()
-    const [detailedCategory, setDetailedCategory] = useState()
-    const [base64, setBase64] = useState()
-
-    const defaultProps = {
-      options: detailedCategories.map((option) => option.name),
-    }
-
-    const handleChangeImageInput = (e) => {
-      let reader = new FileReader()
-      reader.readAsDataURL(e.target.files[0])
-      reader.onload = () => {
-        setBase64(reader.result)
-      }
-    }
-
-    const handleClickAdd = async () => {
-      setIsLoading(true)
-      await axios.post(`${domainName}/api/v1/products/add`, {
-        name: name,
-        detailedCategoryId: detailedCategories.filter((e) => e.name === detailedCategory)[0].id,
-        price: price,
-        description: description,
-        image: base64,
-      })
-      fetchData()
-    }
+    const [password, setPassword] = useState()
 
     const handleClickDelete = async () => {
       setIsLoading(true)
-      await axios.put(`${domainName}/api/v1/products/deleteMultiple`, selectedIndexGLobal)
+      await axios.put(`${domainName}/api/v1/users/deleteMultiple`, selectedIndexGLobal)
       fetchData()
       setSelected([])
     }
@@ -298,40 +247,16 @@ const Product = () => {
     const handleClickOpenEdit = (event) => {
       setAnchorEl(event.currentTarget)
       const productEdit = rows.filter((e) => e.id === parseInt(selectedIndexGLobal[0]))[0]
-      setName(productEdit.name)
-      setDetailedCategory(
-        detailedCategories.filter((e) => e.id === productEdit.detailedCategoryId)[0].name,
-      )
-      setPrice(productEdit.price)
-      setDescription(productEdit.description)
-      setBase64(productEdit.image)
+      setPassword(productEdit.password)
     }
 
     const handleClickEdit = async () => {
       setIsLoading(true)
       const id = selectedIndexGLobal[0]
-      await axios.put(`${domainName}/api/v1/products/update/${id}`, {
-        name: name,
-        detailedCategoryId: detailedCategories.filter((e) => e.name === detailedCategory)[0].id,
-        price: price,
-        description: description,
-        image: base64,
-      })
+      await axios.post(
+        `${domainName}/api/v1/user/changePassword?userId=${id}&newPassword=${password}`,
+      )
       fetchData()
-    }
-
-    const handleClickAddHotProduct = async () => {
-      setIsLoading(true)
-      await axios.post(`${domainName}/api/v1/products/setTrueHotProduct`, selectedIndexGLobal)
-      fetchData()
-      setSelected([])
-    }
-
-    const handleClickRemoveHotProduct = async () => {
-      setIsLoading(true)
-      await axios.post(`${domainName}/api/v1/products/setFalseHotProduct`, selectedIndexGLobal)
-      fetchData()
-      setSelected([])
     }
 
     const open = Boolean(anchorEl)
@@ -387,43 +312,14 @@ const Product = () => {
                   >
                     <TextField
                       id="standard-basic"
-                      label="Tên sản phẩm"
+                      label="Mật khẩu"
                       variant="standard"
                       fullWidth
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      type="text"
                     />
-                    <Autocomplete
-                      {...defaultProps}
-                      fullWidth
-                      value={detailedCategory}
-                      onChange={(event, newValue) => {
-                        setDetailedCategory(newValue)
-                      }}
-                      renderInput={(params) => (
-                        <TextField {...params} label="Danh mục" variant="standard" />
-                      )}
-                    />
-                    <TextField
-                      id="standard-basic"
-                      label="Giá (đ)"
-                      variant="standard"
-                      fullWidth
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      type="number"
-                    />
-                    <TextField
-                      id="filled-multiline-flexible"
-                      label="Mô tả sản phẩm"
-                      fullWidth
-                      multiline
-                      variant="filled"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                    />
-                    <img src={base64} alt={name} width={100} />
-                    <CFormInput type="file" onChange={handleChangeImageInput} on accept="image/*" />
+
                     <Button variant="contained" onClick={handleClickEdit}>
                       Sửa
                     </Button>
@@ -437,99 +333,13 @@ const Product = () => {
         )}
 
         {numSelected > 0 ? (
-          <>
-            {rows.filter((e) => e.id === parseInt(selectedIndexGLobal[0]))[0].isHotProduct ===
-            '1' ? (
-              <Tooltip title="Xóa sản phẩm hot">
-                <IconButton onClick={handleClickRemoveHotProduct}>
-                  <PlaylistRemoveIcon sx={{ fontSize: 30 }} />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Thêm sản phẩm hot">
-                <IconButton onClick={handleClickAddHotProduct}>
-                  <PlaylistAddIcon sx={{ fontSize: 30 }} />
-                </IconButton>
-              </Tooltip>
-            )}
-            <Tooltip title="Xóa">
-              <IconButton onClick={handleClickDelete}>
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </>
-        ) : (
-          <Tooltip title="Thêm">
-            <div>
-              <IconButton onClick={(event) => setAnchorEl(event.currentTarget)}>
-                <AddIcon />
-              </IconButton>
-              <Popover
-                id={id}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={() => setAnchorEl(null)}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-              >
-                <Paper elevation={3} style={{ padding: '35px 40px', minWidth: 800 }}>
-                  <Box
-                    component="form"
-                    sx={{
-                      '& > :not(style)': { m: 1 },
-                    }}
-                    noValidate
-                    autoComplete="off"
-                  >
-                    <TextField
-                      id="standard-basic"
-                      label="Tên sản phẩm"
-                      variant="standard"
-                      fullWidth
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                    <Autocomplete
-                      {...defaultProps}
-                      fullWidth
-                      value={detailedCategory}
-                      onChange={(event, newValue) => {
-                        setDetailedCategory(newValue)
-                      }}
-                      renderInput={(params) => (
-                        <TextField {...params} label="Danh mục" variant="standard" />
-                      )}
-                    />
-                    <TextField
-                      id="standard-basic"
-                      label="Giá (đ)"
-                      variant="standard"
-                      fullWidth
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      type="number"
-                    />
-                    <TextField
-                      id="filled-multiline-flexible"
-                      label="Mô tả sản phẩm"
-                      fullWidth
-                      multiline
-                      variant="filled"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                    />
-                    <img src={base64} alt={name} width={100} />
-                    <CFormInput type="file" onChange={handleChangeImageInput} accept="image/*" />
-                    <Button variant="contained" disableElevation onClick={handleClickAdd}>
-                      Thêm
-                    </Button>
-                  </Box>
-                </Paper>
-              </Popover>
-            </div>
+          <Tooltip title="Xóa">
+            <IconButton onClick={handleClickDelete}>
+              <DeleteIcon />
+            </IconButton>
           </Tooltip>
+        ) : (
+          <></>
         )}
       </Toolbar>
     )
@@ -582,23 +392,17 @@ const Product = () => {
                           }}
                         />
                       </TableCell>
-                      <TableCell component="th" id={labelId} scope="row" padding="none">
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        padding="none"
+                        align="center"
+                      >
                         {row.id}
                       </TableCell>
-                      <TableCell align="left">
-                        {row.name}
-                        <span style={{ color: '#FF0000' }}>
-                          {row.isHotProduct === '1' ? ' (Sản phẩm hot)' : ''}
-                        </span>
-                      </TableCell>
-                      <TableCell align="left">
-                        {detailedCategories.filter((e) => e.id === row.detailedCategoryId)[0].name}
-                      </TableCell>
-                      <TableCell align="left">{row.price}</TableCell>
-                      <TableCell align="left">{row.description}</TableCell>
-                      <TableCell align="right">
-                        <img src={row.image} width={100} alt={row.name} />
-                      </TableCell>
+                      <TableCell align="center">{row.username}</TableCell>
+                      <TableCell align="center">{row.password}</TableCell>
                     </TableRow>
                   )
                 })}
@@ -628,4 +432,4 @@ const Product = () => {
   )
 }
 
-export default Product
+export default Accounts
