@@ -19,21 +19,17 @@ import {
   Popover,
   TextField,
   Button,
-  Autocomplete,
   LinearProgress,
 } from '@mui/material'
-import { CFormInput } from '@coreui/react'
 import DeleteIcon from '@mui/icons-material/Delete'
-import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
-import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove'
 import PropTypes from 'prop-types'
 import { alpha } from '@mui/material/styles'
 import { visuallyHidden } from '@mui/utils'
 import axios from 'axios'
 
-import domainName from 'src/domainName'
+import domainName from 'src/environment/domainName'
+import header from 'src/environment/header'
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -161,7 +157,6 @@ const Accounts = () => {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [rows, setRows] = useState([])
-  const [detailedCategories, setDetailedCategories] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
   const handleRequestSort = (event, property) => {
@@ -216,7 +211,7 @@ const Accounts = () => {
   const fetchData = async () => {
     setIsLoading(true)
     try {
-      const res = await axios.get(`${domainName}/api/v1/user/getAll`)
+      const res = await axios.get(`${domainName}/api/v1/user/getAll`, header)
       setRows(res.data)
     } catch (error) {
       console.log(error)
@@ -239,7 +234,7 @@ const Accounts = () => {
 
     const handleClickDelete = async () => {
       setIsLoading(true)
-      await axios.put(`${domainName}/api/v1/users/deleteMultiple`, selectedIndexGLobal)
+      await axios.put(`${domainName}/api/v1/users/deleteMultiple`, selectedIndexGLobal, header)
       fetchData()
       setSelected([])
     }
@@ -254,7 +249,8 @@ const Accounts = () => {
       setIsLoading(true)
       const id = selectedIndexGLobal[0]
       await axios.post(
-        `${domainName}/api/v1/user/changePassword?userId=${id}&newPassword=${password}`,
+        `${domainName}/api/v1/user/updatePassword?userId=${id}&newPassword=${password}`,
+        header,
       )
       fetchData()
     }

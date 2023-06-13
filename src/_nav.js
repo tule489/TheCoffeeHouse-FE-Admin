@@ -60,7 +60,7 @@ const _nav = [
       color: 'info',
     },
   },
-  sessionStorage.getItem('permission') === 'admin'
+  localStorage.getItem('role') === 'ADMIN'
     ? {
         component: CNavTitle,
         name: 'Quản lý tài khoản',
@@ -69,7 +69,7 @@ const _nav = [
         component: CNavTitle,
         name: '',
       },
-  sessionStorage.getItem('permission') === 'admin'
+  localStorage.getItem('role') === 'ADMIN'
     ? {
         component: CNavItem,
         name: 'Quản lý tài khoản',

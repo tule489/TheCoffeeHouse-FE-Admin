@@ -29,7 +29,8 @@ import { alpha } from '@mui/material/styles'
 import { visuallyHidden } from '@mui/utils'
 import axios from 'axios'
 
-import domainName from 'src/domainName'
+import domainName from 'src/environment/domainName'
+import header from 'src/environment/header'
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -65,7 +66,7 @@ const headCells = [
     position: 'left',
     disablePadding: false,
     sort: true,
-    label: 'ID',
+    label: 'Mã danh mục',
   },
   {
     id: 'name',
@@ -229,15 +230,23 @@ const Category = () => {
 
     const handleClickAdd = async () => {
       setIsLoading(true)
-      await axios.post(`${domainName}/api/v1/categories/add`, {
-        name: name,
-      })
+      await axios.post(
+        `${domainName}/api/v1/categories/add`,
+        {
+          name: name,
+        },
+        header,
+      )
       fetchData()
     }
 
     const handleClickDelete = async () => {
       setIsLoading(true)
-      await axios.put(`${domainName}/api/v1/categories/deleteMultiple`, selectedIndexGLobal)
+      await axios.post(
+        `${domainName}/api/v1/categories/deleteMultiple`,
+        selectedIndexGLobal,
+        header,
+      )
       fetchData()
       setSelected([])
     }
@@ -251,9 +260,13 @@ const Category = () => {
     const handleClickEdit = async () => {
       setIsLoading(true)
       const id = selectedIndexGLobal[0]
-      await axios.put(`${domainName}/api/v1/categories/update/${id}`, {
-        name: name,
-      })
+      await axios.put(
+        `${domainName}/api/v1/categories/update/${id}`,
+        {
+          name: name,
+        },
+        header,
+      )
       fetchData()
     }
 

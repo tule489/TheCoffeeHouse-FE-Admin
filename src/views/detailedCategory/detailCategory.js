@@ -30,7 +30,7 @@ import { alpha } from '@mui/material/styles'
 import { visuallyHidden } from '@mui/utils'
 import axios from 'axios'
 
-import domainName from 'src/domainName'
+import domainName from 'src/environment/domainName'
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -66,7 +66,7 @@ const headCells = [
     position: 'left',
     disablePadding: false,
     sort: true,
-    label: 'ID',
+    label: 'Mã danh mục chi tiết',
   },
   {
     id: 'name',
@@ -250,7 +250,10 @@ const DetailedCategory = () => {
 
     const handleClickDelete = async () => {
       setIsLoading(true)
-      await axios.put(`${domainName}/api/v1/detailedCategories/deleteMultiple`, selectedIndexGLobal)
+      await axios.post(
+        `${domainName}/api/v1/detailedCategories/deleteMultiple`,
+        selectedIndexGLobal,
+      )
       fetchData()
       setSelected([])
     }

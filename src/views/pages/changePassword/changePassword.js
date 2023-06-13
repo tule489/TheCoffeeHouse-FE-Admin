@@ -12,37 +12,41 @@ import {
   CRow,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser, cilArrowLeft } from '@coreui/icons'
+import { cilLockLocked, cilArrowLeft } from '@coreui/icons'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
-import domainName from 'src/domainName'
+import domainName from 'src/environment/domainName'
+import header from 'src/environment/header'
 
 const ChangePassword = () => {
-  const [username, setUsername] = useState()
+  const [oldPassword, setOldPassword] = useState()
   const [password, setPassword] = useState()
   const [repeatPassword, setRepeatPassword] = useState()
   const [message, setMessage] = useState()
 
-  const handleClickRegister = async () => {
+  const handleClickChangePassword = async () => {
     if (password === repeatPassword) {
-      const res = await axios.post(
-        `${domainName}/api/v1/user/authorization/${localStorage.getItem('userId')}`,
-      )
-      if (res.data.data === 'admin') {
-        try {
-          await axios
-            .post(`${domainName}/api/v1/user/register`, {
-              username: username,
-              password: password,
-            })
-            .then((res) => setMessage(res.data.message))
-          return
-        } catch (error) {
-          setMessage(error.response.data.message)
-          return
-        }
+      try {
+        await axios
+          .post(
+            `${domainName}/api/v1/auth/changePassword`,
+            {
+              newPassword: password,
+              oldPassword: oldPassword,
+            },
+            header,
+          )
+          .then((res) => {
+            setMessage(res.data.message)
+            setOldPassword('')
+            setPassword('')
+            setRepeatPassword('')
+          })
+        return
+      } catch (error) {
+        setMessage(error.response.data.message)
+        return
       }
-      setMessage('User does not have permission')
     }
     setMessage('Repeat password is incorrect')
   }
@@ -54,18 +58,15 @@ const ChangePassword = () => {
           <CCol md={9} lg={7} xl={6}>
             <CCard className="mx-4">
               <CCardBody className="p-4">
-                <Link to="/">
+                <Link to="/" style={{ textDecoration: 'none' }}>
                   <CIcon icon={cilArrowLeft} className="me-2" style={{ fontSize: '4rem' }} />
-                  <span
-                    className="text-medium-emphasis"
-                    style={{ fontSize: 20, textDecoration: 'none' }}
-                  >
+                  <span className="text-medium-emphasis" style={{ fontSize: 20 }}>
                     Quay lại
                   </span>
                 </Link>
                 <br />
                 <CForm>
-                  <h1>Đăng ký</h1>
+                  <h1>Đổi mật khẩu</h1>
                   <br />
                   {message != null ? (
                     <p
@@ -80,12 +81,14 @@ const ChangePassword = () => {
                   )}
                   <CInputGroup className="mb-3">
                     <CInputGroupText>
-                      <CIcon icon={cilUser} />
+                      <CIcon icon={cilLockLocked} />
                     </CInputGroupText>
                     <CFormInput
-                      placeholder="Username"
-                      autoComplete="username"
-                      onChange={(e) => setUsername(e.target.value)}
+                      type="password"
+                      placeholder="Mật khẩu cũ"
+                      autoComplete="old-password"
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
                     />
                   </CInputGroup>
                   <CInputGroup className="mb-3">
@@ -94,8 +97,9 @@ const ChangePassword = () => {
                     </CInputGroupText>
                     <CFormInput
                       type="password"
-                      placeholder="Password"
+                      placeholder="Mật khẩu mới"
                       autoComplete="new-password"
+                      value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </CInputGroup>
@@ -105,14 +109,15 @@ const ChangePassword = () => {
                     </CInputGroupText>
                     <CFormInput
                       type="password"
-                      placeholder="Repeat password"
+                      placeholder="Nhập lại mật khẩu"
                       autoComplete="new-password"
+                      value={repeatPassword}
                       onChange={(e) => setRepeatPassword(e.target.value)}
                     />
                   </CInputGroup>
                   <div className="d-grid">
-                    <CButton color="success" onClick={handleClickRegister}>
-                      Tạo tài khoản
+                    <CButton color="success" onClick={handleClickChangePassword}>
+                      Xác nhận
                     </CButton>
                   </div>
                 </CForm>

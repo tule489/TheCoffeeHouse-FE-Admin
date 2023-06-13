@@ -15,7 +15,7 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser, cilArrowLeft } from '@coreui/icons'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
-import domainName from 'src/domainName'
+import domainName from 'src/environment/domainName'
 
 const Register = () => {
   const [username, setUsername] = useState()
@@ -25,30 +25,23 @@ const Register = () => {
 
   const handleClickRegister = async () => {
     if (password === repeatPassword) {
-      const res = await axios.post(
-        `${domainName}/api/v1/user/authorization/${sessionStorage.getItem('userId')}`,
-      )
-      if (res.data.data === 'admin') {
-        try {
-          await axios
-            .post(`${domainName}/api/v1/user/register`, {
-              username: username,
-              password: password,
-              permission: 'staff',
-            })
-            .then((res) => {
-              setMessage(res.data.message)
-              setUsername('')
-              setPassword('')
-              setRepeatPassword('')
-            })
-          return
-        } catch (error) {
-          setMessage(error.response.data.message)
-          return
-        }
+      try {
+        await axios
+          .post(`${domainName}/api/v1/auth/register`, {
+            username: username,
+            password: password,
+          })
+          .then((res) => {
+            setMessage(res.data.message)
+            setUsername('')
+            setPassword('')
+            setRepeatPassword('')
+          })
+        return
+      } catch (error) {
+        setMessage(error.response.data.message)
+        return
       }
-      setMessage('User does not have permission')
     }
     setMessage('Repeat password is incorrect')
   }
@@ -86,7 +79,7 @@ const Register = () => {
                       <CIcon icon={cilUser} />
                     </CInputGroupText>
                     <CFormInput
-                      placeholder="Username"
+                      placeholder="Tên đăng nhập"
                       autoComplete="username"
                       onChange={(e) => setUsername(e.target.value)}
                     />
@@ -96,7 +89,7 @@ const Register = () => {
                       <CIcon icon={cilLockLocked} />
                     </CInputGroupText>
                     <CFormInput
-                      type="password"
+                      type="Mật khẩu đăng nhập"
                       placeholder="Password"
                       autoComplete="new-password"
                       onChange={(e) => setPassword(e.target.value)}
@@ -107,7 +100,7 @@ const Register = () => {
                       <CIcon icon={cilLockLocked} />
                     </CInputGroupText>
                     <CFormInput
-                      type="password"
+                      type="Nhập lại mật khẩu"
                       placeholder="Repeat password"
                       autoComplete="new-password"
                       onChange={(e) => setRepeatPassword(e.target.value)}

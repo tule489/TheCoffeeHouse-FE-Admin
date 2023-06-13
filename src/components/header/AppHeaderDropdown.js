@@ -15,26 +15,26 @@ import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined'
 
 const AppHeaderDropdown = () => {
   const handleClickLogout = () => {
-    sessionStorage.removeItem('userId')
-    sessionStorage.removeItem('permission')
+    localStorage.removeItem('token')
+    localStorage.removeItem('role')
   }
 
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0" caret={false}>
-        {sessionStorage.getItem('permission') === 'admin' ? (
+        {localStorage.getItem('role') === 'ADMIN' ? (
           <CAvatar src={avatar8} size="md" />
         ) : (
           <CAvatar src={userAvatar} size="md" />
         )}
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
-        <CDropdownHeader className="bg-light fw-semibold py-2">Account</CDropdownHeader>
+        <CDropdownHeader className="bg-light fw-semibold py-2">Tài khoản</CDropdownHeader>
         <CDropdownItem href="#/changePassword">
           <VpnKeyOutlinedIcon className="me-2" sx={{ fontSize: 16 }} />
           Đổi mật khẩu
         </CDropdownItem>
-        {sessionStorage.getItem('permission') === 'admin' ? (
+        {localStorage.getItem('role') === 'ADMIN' ? (
           <CDropdownItem href="#/register">
             <CIcon icon={cilUserPlus} className="me-2" />
             Đăng ký

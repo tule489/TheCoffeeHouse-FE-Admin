@@ -27,7 +27,8 @@ import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
-import domainName from 'src/domainName'
+import domainName from 'src/environment/domainName'
+import header from 'src/environment/header'
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -248,11 +249,10 @@ const Order = () => {
 
   function EnhancedTableToolbar(props) {
     const { numSelected } = props
-    const [anchorEl, setAnchorEl] = useState(null)
 
     const handleClickDelete = async () => {
       setIsLoading(true)
-      await axios.put(`${domainName}/api/v1/order/deleteMultiple`, selected)
+      await axios.post(`${domainName}/api/v1/orders/deleteMultiple`, selected, header)
       fetchData()
       setSelected([])
     }
@@ -264,6 +264,10 @@ const Order = () => {
       await axios.put(`${domainName}/api/v1/orders/updateStatus/${id}`, e.target.value, {
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
+          withCredentials: false,
+          Accept: 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       })
       fetchData()

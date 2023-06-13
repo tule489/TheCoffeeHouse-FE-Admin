@@ -33,7 +33,8 @@ import { alpha } from '@mui/material/styles'
 import { visuallyHidden } from '@mui/utils'
 import axios from 'axios'
 
-import domainName from 'src/domainName'
+import domainName from 'src/environment/domainName'
+import header from 'src/environment/header'
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -66,10 +67,10 @@ function stableSort(array, comparator) {
 const headCells = [
   {
     id: 'id',
-    position: 'left',
+    position: 'center',
     disablePadding: false,
     sort: true,
-    label: 'ID',
+    label: 'Mã sản phẩm',
   },
   {
     id: 'name',
@@ -268,6 +269,13 @@ const Product = () => {
       options: detailedCategories.map((option) => option.name),
     }
 
+    const formatNumber = (value) => {
+      const parts = value.toString().split('.')
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+
+      return parts.join('.')
+    }
+
     const handleChangeImageInput = (e) => {
       let reader = new FileReader()
       reader.readAsDataURL(e.target.files[0])
@@ -278,19 +286,23 @@ const Product = () => {
 
     const handleClickAdd = async () => {
       setIsLoading(true)
-      await axios.post(`${domainName}/api/v1/products/add`, {
-        name: name,
-        detailedCategoryId: detailedCategories.filter((e) => e.name === detailedCategory)[0].id,
-        price: price,
-        description: description,
-        image: base64,
-      })
+      await axios.post(
+        `${domainName}/api/v1/products/add`,
+        {
+          name: name,
+          detailedCategoryId: detailedCategories.filter((e) => e.name === detailedCategory)[0].id,
+          price: formatNumber(price),
+          description: description,
+          image: base64,
+        },
+        header,
+      )
       fetchData()
     }
 
     const handleClickDelete = async () => {
       setIsLoading(true)
-      await axios.put(`${domainName}/api/v1/products/deleteMultiple`, selectedIndexGLobal)
+      await axios.post(`${domainName}/api/v1/products/deleteMultiple`, selectedIndexGLobal, header)
       fetchData()
       setSelected([])
     }
@@ -310,26 +322,38 @@ const Product = () => {
     const handleClickEdit = async () => {
       setIsLoading(true)
       const id = selectedIndexGLobal[0]
-      await axios.put(`${domainName}/api/v1/products/update/${id}`, {
-        name: name,
-        detailedCategoryId: detailedCategories.filter((e) => e.name === detailedCategory)[0].id,
-        price: price,
-        description: description,
-        image: base64,
-      })
+      await axios.put(
+        `${domainName}/api/v1/products/update/${id}`,
+        {
+          name: name,
+          detailedCategoryId: detailedCategories.filter((e) => e.name === detailedCategory)[0].id,
+          price: formatNumber(price),
+          description: description,
+          image: base64,
+        },
+        header,
+      )
       fetchData()
     }
 
     const handleClickAddHotProduct = async () => {
       setIsLoading(true)
-      await axios.post(`${domainName}/api/v1/products/setTrueHotProduct`, selectedIndexGLobal)
+      await axios.post(
+        `${domainName}/api/v1/products/setTrueHotProduct`,
+        selectedIndexGLobal,
+        header,
+      )
       fetchData()
       setSelected([])
     }
 
     const handleClickRemoveHotProduct = async () => {
       setIsLoading(true)
-      await axios.post(`${domainName}/api/v1/products/setFalseHotProduct`, selectedIndexGLobal)
+      await axios.post(
+        `${domainName}/api/v1/products/setFalseHotProduct`,
+        selectedIndexGLobal,
+        header,
+      )
       fetchData()
       setSelected([])
     }
@@ -582,7 +606,13 @@ const Product = () => {
                           }}
                         />
                       </TableCell>
-                      <TableCell component="th" id={labelId} scope="row" padding="none">
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        padding="none"
+                        align="center"
+                      >
                         {row.id}
                       </TableCell>
                       <TableCell align="left">

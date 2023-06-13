@@ -15,7 +15,7 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import axios from 'axios'
-import domainName from 'src/domainName'
+import domainName from 'src/environment/domainName'
 
 const Login = () => {
   const [username, setUsername] = useState()
@@ -25,18 +25,16 @@ const Login = () => {
   const handleClickLogin = async () => {
     try {
       await axios
-        .post(`${domainName}/api/v1/user/login`, {
+        .post(`${domainName}/api/v1/auth/login`, {
           username: username,
           password: password,
         })
         .then((res) => {
-          const data = res.data.data
-          setMessage(res.data.message)
-          sessionStorage.setItem('userId', data.id)
-          sessionStorage.setItem('permission', data.permission)
+          localStorage.setItem('token', res.data.data.token)
+          localStorage.setItem('role', res.data.data.role)
         })
     } catch (error) {
-      setMessage(error.response.data.message)
+      setMessage('Tài khoản hoặc mật khẩu không chính xác')
       return
     }
     window.location.href = '/'
@@ -62,6 +60,11 @@ const Login = () => {
                         placeholder="Username"
                         autoComplete="username"
                         onChange={(e) => setUsername(e.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.keyCode === 13) {
+                            handleClickLogin()
+                          }
+                        }}
                       />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
@@ -73,6 +76,11 @@ const Login = () => {
                         placeholder="Password"
                         autoComplete="current-password"
                         onChange={(e) => setPassword(e.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.keyCode === 13) {
+                            handleClickLogin()
+                          }
+                        }}
                       />
                     </CInputGroup>
                     <CRow>
