@@ -51,6 +51,11 @@ class App extends Component {
             <Route
               path="*"
               name="Home"
+              element={isTokenValid() === true ? <DefaultLayout /> : <Login />}
+            />
+            <Route
+              path="*"
+              name="Home"
               element={isTokenValid() === true ? <DefaultLayout /> : <Navigate to="/login" />}
             />
           </Routes>
