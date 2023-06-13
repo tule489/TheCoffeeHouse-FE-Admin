@@ -23,9 +23,8 @@ const isTokenValid = () => {
   const accessToken = localStorage.getItem('token')
   if (accessToken) {
     decode = jwtDecode(accessToken)
-    const currentDate = Date.now() / 1000
     localStorage.setItem('username', decode.sub)
-    return currentDate < decode.exp
+    return Date.now() / 1000 < decode.exp
   }
   return false
 }
@@ -49,7 +48,6 @@ class App extends Component {
               element={<ChangePassword />}
             />
             <Route exact path="/404" name="Page 404" element={<Page404 />} />
-            <Route exact path="/changePassword" name="Change password" element={<Page404 />} />
             <Route
               path="*"
               name="Home"

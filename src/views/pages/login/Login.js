@@ -23,6 +23,7 @@ const Login = () => {
   const [message, setMessage] = useState()
 
   const handleClickLogin = async () => {
+    setMessage(null)
     try {
       await axios
         .post(`${domainName}/api/v1/auth/login`, {
