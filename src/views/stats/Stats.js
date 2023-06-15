@@ -139,8 +139,9 @@ const Stats = () => {
       })
       .then((result) => {
         const link = document.createElement('a')
+        const now = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
         link.href = window.URL.createObjectURL(new Blob([result.data]))
-        link.setAttribute('download', 'test.xlsx')
+        link.setAttribute('download', `Bao-cao-doanh-thu_${now}.xlsx`)
         document.body.appendChild(link)
         link.click()
         setIsLoading(false)

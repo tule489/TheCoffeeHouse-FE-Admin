@@ -31,6 +31,7 @@ import { visuallyHidden } from '@mui/utils'
 import axios from 'axios'
 
 import domainName from 'src/environment/domainName'
+import header from 'src/environment/header'
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -241,10 +242,14 @@ const DetailedCategory = () => {
 
     const handleClickAdd = async () => {
       setIsLoading(true)
-      await axios.post(`${domainName}/api/v1/detailedCategories/add`, {
-        name: name,
-        categoryId: categories.filter((e) => e.name === category)[0].id,
-      })
+      await axios.post(
+        `${domainName}/api/v1/detailedCategories/add`,
+        {
+          name: name,
+          categoryId: categories.filter((e) => e.name === category)[0].id,
+        },
+        header,
+      )
       fetchData()
     }
 
@@ -253,6 +258,7 @@ const DetailedCategory = () => {
       await axios.post(
         `${domainName}/api/v1/detailedCategories/deleteMultiple`,
         selectedIndexGLobal,
+        header,
       )
       fetchData()
       setSelected([])
@@ -268,10 +274,14 @@ const DetailedCategory = () => {
     const handleClickEdit = async () => {
       setIsLoading(true)
       const id = selectedIndexGLobal[0]
-      await axios.put(`${domainName}/api/v1/detailedCategories/update/${id}`, {
-        name: name,
-        categoryId: categories.filter((e) => e.name === category)[0].id,
-      })
+      await axios.put(
+        `${domainName}/api/v1/detailedCategories/update/${id}`,
+        {
+          name: name,
+          categoryId: categories.filter((e) => e.name === category)[0].id,
+        },
+        header,
+      )
       fetchData()
     }
 
